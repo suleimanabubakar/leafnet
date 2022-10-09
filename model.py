@@ -129,8 +129,8 @@ def train(train_loader, model, criterion, optimizer, epoch):
         (input,target),(path,_) = data
         # measure data loading time
         if USE_CUDA:
-            input = input.cuda(async=True)
-            target = target.cuda(async=True)
+            input = input.cuda(non_blocking=True)
+            target = target.cuda(non_blocking=True)
 
         data_time.update(time.time() - end)
 
@@ -195,8 +195,8 @@ def validate(val_loader, model, criterion):
     
     for i, (input, target) in enumerate(val_loader):
         if USE_CUDA:
-            input = input.cuda(async=True)
-            target = target.cuda(async=True)
+            input = input.cuda(non_blocking=True)
+            target = target.cuda(non_blocking=True)
         with torch.no_grad(): 
             input_var = torch.autograd.Variable(input)
             target_var = torch.autograd.Variable(target)
@@ -271,7 +271,7 @@ def accuracy(output, target, topk=(1,), path = None, minibatch = None):
 
     res = []
     for k in topk:
-        correct_k = correct[:k].view(-1).float().sum(0)
+        correct_k = correct[:k].reshape(-1).float().sum(0)
         res.append(correct_k.mul_(100.0 / batch_size))
     ## save mislabeled data
     if path:
